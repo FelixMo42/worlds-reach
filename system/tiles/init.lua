@@ -38,6 +38,7 @@ end
 
 function system.tiles:save(data)
 	if data.save then return data:save() end
+	data.file = data.file or data.name:sub(1,2)..(#system.filesystem:getDirectory("data/"..class.."s" , ".lua") + 1)
 	local s = "return system.tiles."..data.type..":new({"
 	local t = {}
 	for k , v in pairs(data) do
@@ -51,7 +52,7 @@ function system.tiles:save(data)
 end
 
 function system.tiles:load(class)
-	for i , n in ipairs(self:getDirectory(class,".lua")) do
+	for i , n in ipairs( system.filesystem:getDirectory("data/"..class.."s" , ".lua") ) do
 		system.tiles[class][ #system.tiles[class] + 1 ] = loadstring( system.filesystem.read(class.."/"..n) )
 		system.tiles[class][ system.tiles[class][ #system.tiles[class] ].name ] = system.tiles[class][ #system.tiles[class] ]
 		system.tiles[class][ system.tiles[class][ #system.tiles[class] ].id ] = system.tiles[class][ #system.tiles[class] ]

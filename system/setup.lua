@@ -13,6 +13,7 @@ system.update.folder = function(f)
 end
 
 system.update.include = function(f,g)
+	if system.filesystem.isApp then return require("system/"..f , "system/"..f.."/" , g) end
 	if not system.update.updated[f] then
 		system.update.folder(f.."/")
 	end

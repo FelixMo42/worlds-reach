@@ -1,15 +1,10 @@
 system = setmetatable( {} , { __index = function(self,key) self[key] = {}; return self[key] end } )
 
 system.update.directory = "Users/felixmo/Desktop/library/"
-system.update.print = function(self,t)
-	love.graphics.print(t , 10 , love.graphics.getHeight() - 10 - love.graphics.getFont():getHeight())
-	love.graphics.present()
-end
 system.update.update = function(self,path)
 	local od = system.filesystem:execute( "stat -f %Sm "..(system.update.directory..path):gsub(" ","\\ ") )
 	local ld = system.filesystem:execute( "stat -f %Sm "..(system.filesystem.directory..path):gsub(" ","\\ ") )
 	if ld == "" or os.macDate(ld) < os.macDate(od) then
-		system.update:print("updating "..path)
 		for i = #path , 1 , -1 do
 			if path:sub(i,i) == "/" then
 				os.execute("mkdir "..system.filesystem.directory:gsub(" ","\\ ")..path:sub(1,i-1):gsub(" ","\\ ") )
@@ -22,7 +17,7 @@ system.update.update = function(self,path)
 end
 
 system.filesystem.directory = love.filesystem.getSource().."/"
-system.filesystem.isApp = system.filesystem.directory:find(".love")
+system.filesystem.isApp = system.filesystem.directory:find(".love") or system.filesystem.directory == "/.//"
 system.filesystem.path = function(self,path)
 	return path:find("Users") and path or self.directory..path
 end
@@ -43,11 +38,19 @@ system.filesystem.read = function(self,path)
 	file:close()
 	return r
 end
-system.filesystem.getDirectory = function(self,file,ext,hidden)
+system.filesystem.getDirectory = function(self,file)
 	if type(ext) == "boolean" then hidden , ext = ext , hidden end
-	local path , i , t = self:path(file):gsub(" ","\\ ") , 1 , {}
-    local pfile = io.popen('ls -a '..path)
-    for filename in pfile:lines() do
+	local path , i , t , files = self:path(file):gsub(" ","\\ ") , 1 , {} , {}
+	if system.filesystem.isApp and system.filesystem.directory == love.filesystem.getSource().."/" then
+		files = love.filesystem.getDirectoryItems(file)
+	else
+		local pfile = io.popen("ls -a "..path)
+		for filename in pfile:lines() do
+			files[#files + 1] = filename
+		end
+		pfile:close()
+	end
+    for _, filename in pairs(files) do
         if filename:sub(1,1) ~= "." or hidden then
             if not ext or filename:find(ext) then
                 t[i] = filename
@@ -55,7 +58,6 @@ system.filesystem.getDirectory = function(self,file,ext,hidden)
             end
         end
 	end
-    pfile:close()
     return t
 end
 system.filesystem.exist = function(self,path)
@@ -73,6 +75,7 @@ os.macDate = function(str)
 	return os.time({day = day, month = month, year = year, hour = hour, min = min, sec = sec}) + os.time() - os.time(os.date("!*t"))
 end
 
+if not system.filesystem:exist(system.update.directory)  then return require("system") end
 if system.filesystem.isApp then return require("system") end
 
 system.update:update("main.lua")

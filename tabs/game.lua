@@ -46,8 +46,8 @@ game.map:nextTurn()
 
 --ui
 
-game.button = ui.button:new({over_b = 0, edge = 0, font = font.default})
-game.menu = ui.menu:new({over_b = 0, edge = 0, font = font.default})
+game.button = ui.button:new({over_b = 0, edge = 0, font = font.default, over_bodyColor = color.grey})
+game.menu = ui.menu:new({over_b = 0, edge = 0, font = font.default, over_bodyColor = color.grey})
 
 game.ui:add( game.menu:new({
 	text = "actions",
@@ -152,7 +152,7 @@ function game.update(dt)
 	end
 end
 
-function game.mousemoved(x,y,dx,dy)
+function game.mousemoved(x,y)
 	mouse.tile.sx = math.floor(mouse.sx / settings.tiles.scale + game.map.x)
 	mouse.tile.sy = math.floor(mouse.sy / settings.tiles.scale + game.map.y)
 	mouse.tile.ex = math.floor(mouse.ex / settings.tiles.scale + game.map.x)

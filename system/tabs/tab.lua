@@ -3,27 +3,11 @@ local tab = class:new({
 	layer = {}
 })
 
-local function add(self,item,i,name)
-	if type(i) == "string" then
-		self[i] = item
-		i = name
-	elseif name then
-		self[name] = item
-	end
-	if i == -1 then
-		i = #self + 2 - i
-	else
-		i = i or #self + 1
-	end
-	table.insert(self,i,item)
-	return item
-end
-
 function tab:__init()
 	self:addLayer("ui")
-	self:addLayer("main")
-	self.layer.main.tab = _G[self.name]
-	function self.layer.main:dofunc(f,...)
+	local layer = self:addLayer("main")
+	layer.tab = _G[self.name]
+	function layer:dofunc(f,...)
 		if self.tab[f] then
 			return self.tab[f](...)
 		end
@@ -31,17 +15,22 @@ function tab:__init()
 end
 
 function tab:addLayer(name , i)
-	self.layer[name] = {add = add}
-	_G[self.name][name] = self.layer[name]
-	i = i or #self.layer  + 1
-	table.insert(self.layer,i,self.layer[name])
+	local layer = { add = table.add }
+	_G[self.name][name] = layer
+	local i = i or #self.layer  + 1
+	table.insert(self.layer,i,name)
+	return layer
 end
 
 function tab:dofunc(f,...)
-	local ret = {}
-	revers = (f == "draw")
+	local ret , layer = {} , {}
+	local revers = (f == "draw")
 	for i = revers and #self.layer or 1 , revers and 1 or #self.layer , revers and -1 or 1 do
-		local layer = self.layer[i]
+		if type( self.layer[i] ) == "string" then
+			layer = _G[self.name][self.layer[i]]
+		else
+			layer = self.layer[i]
+		end
 		if layer.dofunc then
 			ret[#ret + 1] = layer:dofunc(f,...)
 		else

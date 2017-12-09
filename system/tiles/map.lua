@@ -101,6 +101,10 @@ function map:setPos(x,y)
 	end
 end
 
+function map:move(dx,dy)
+	self:setPos(self.x - dx , self.y - dy)
+end
+
 --load
 
 system.tiles.maps = {}

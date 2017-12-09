@@ -70,7 +70,9 @@ local function newmetafunction(key)
 	end
 end
 
-for i , k in pairs({"index","newindex","mode","call","tostring","unm","add","sub","mul","div","idiv","len","mod","pow","concat","eq","lt","le"}) do
+local love = {"index","newindex","mode","call","tostring","unm","add","sub","mul","div","idiv","len","mod","pow","concat","eq","lt","le"}
+
+for i , k in pairs(love) do
 	metatable["__"..k] = newmetafunction("__"..k)
 end
 
