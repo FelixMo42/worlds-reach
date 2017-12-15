@@ -71,16 +71,12 @@ function map:removePlayer(p)
 	p.tile.player = nil
 end
 
-function map:nextTurn()
-	self.position = self.position + 1
-	if self.position > #self.players then
-		self.turn = self.turn + 1
-		self.position = 1
-	end
-	self.player = self.players[self.position]
-	self.player:turn()
-	if system.tabs.current then
-		system.tabs.current:dofunc("turn",self)
+function map:setTile(t,sx,sy,ex,ey)
+	ex , ey = ex or sx , ey or sy
+	for x = sx , ex , math.sign(ex - sx) == 0 and 1 or math.sign(ex - sx) do
+		for y = sy , ey , math.sign(ey - sy) == 0 and 1 or math.sign(ey - sy) do
+			table.set( self[x][y] , self[x][y]:new( t ) )
+		end
 	end
 end
 
@@ -103,6 +99,19 @@ end
 
 function map:move(dx,dy)
 	self:setPos(self.x - dx , self.y - dy)
+end
+
+function map:nextTurn()
+	self.position = self.position + 1
+	if self.position > #self.players then
+		self.turn = self.turn + 1
+		self.position = 1
+	end
+	self.player = self.players[self.position]
+	self.player:turn()
+	if system.tabs.current then
+		system.tabs.current:dofunc("turn",self)
+	end
 end
 
 --load

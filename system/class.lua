@@ -12,7 +12,7 @@ local metamethode = {
 		local mt = getmetatable(self)
 		if mt.__get then return mt.__get(self , key) end
 		if mt.__getter[key] then return mt.__getter[key](self , key) end
-		if mt.__values[key] then return mt.__values[key] end
+		return mt.__values[key]
 	end,
 	__newindex = function(self , key , value)
 		local mt = getmetatable(self)

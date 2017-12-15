@@ -4,7 +4,7 @@ class = require "system/class"
 
 --set up
 
-system.settings = setmetatable( {} , { __index = function(self,key) self[key] = {}; return self[key] end } )
+system.settings = setmetatable( {} , getmetatable( system ) )
 if love.conf then love.conf(system.settings) end
 
 if system.settings.update.default or system.settings.update.default == nil then

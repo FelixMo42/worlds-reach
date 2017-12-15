@@ -34,11 +34,14 @@ system.filesystem.write = function(self,path,content)
 end
 system.filesystem.read = function(self,path)
 	local file = io.open(self:path(path) , "r")
+	if not file then
+		return love.errhand("Cannot find file: "..path.." | using path: "..self:path(path))
+	end
 	local r = file:read("*a")
 	file:close()
 	return r
 end
-system.filesystem.getDirectory = function(self,file)
+system.filesystem.getDirectory = function(self,file,ext,hidden)
 	if type(ext) == "boolean" then hidden , ext = ext , hidden end
 	local path , i , t , files = self:path(file):gsub(" ","\\ ") , 1 , {} , {}
 	if system.filesystem.isApp and system.filesystem.directory == love.filesystem.getSource().."/" then
@@ -50,7 +53,7 @@ system.filesystem.getDirectory = function(self,file)
 		end
 		pfile:close()
 	end
-    for _, filename in pairs(files) do
+    for _ , filename in pairs(files) do
         if filename:sub(1,1) ~= "." or hidden then
             if not ext or filename:find(ext) then
                 t[i] = filename

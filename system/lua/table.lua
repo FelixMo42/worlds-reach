@@ -5,18 +5,18 @@ local function str(v)
     return tostring(v)
 end
 
-function table.format(t,s,tables)
+function table.format(self, s, tables)
     local s = s or ""
-    if type(t) ~= "table" then return s..str(t) end
+    if type(self) ~= "table" then return s..str(self) end
     local tables = tables or {}
-    if tables[t] then
-        if tables[tables[t]] then
-            return s.."T"..tables[t]
+    if tables[self] then
+        if tables[tables[self]] then
+            return s.."T"..tables[self]
         end
-        tables[tables[t]] = t
+        tables[tables[self]] = self
     end
     local s = s.."{"
-    for k , v in pairs(t) do
+    for k , v in pairs(self) do
         if type(v) ~= "function" then
             if type(v) == "table" and not tables[v] then
                 tables[v] = #tables + 1
@@ -29,18 +29,26 @@ function table.format(t,s,tables)
     return s.."}"
 end
 
-function table.add(self,item,i,name)
+function table.add(self, item, i, name)
     if type(i) == "string" then
         self[i] = item
         i = name
-    elseif name then
+    end
+    if name then
         self[name] = item
     end
-    if i == -1 then
+    i = i or #self + 1
+    if i < 0 then
         i = #self + 2 - i
-    else
-        i = i or #self + 1
     end
     table.insert(self,i,item)
     return item
+end
+
+function table.size(self)
+    l = 0
+    for k , v in pairs(self) do
+        l = l + 1
+    end
+    return l
 end

@@ -2,17 +2,17 @@
 
 system.update.updated = {}
 
-system.update.globalize = function(l,f,t)
+function system.update.globalize(l,f,t)
 	(t or _G)[l] = (f or system)[l]
 end
 
-system.update.folder = function(f)
+function system.update.folder (f)
 	for i , path in pairs(system.filesystem:getDirectory(system.update.directory.."system/"..f)) do
 		system.update:update("system/"..f..path)
 	end
 end
 
-system.update.include = function(f,g)
+function system.update.include(f,g)
 	if system.filesystem.isApp then return require("system/"..f , "system/"..f.."/" , g) end
 	if not system.update.updated[f] then
 		system.update.folder(f.."/")
@@ -21,7 +21,7 @@ system.update.include = function(f,g)
 	return require("system/"..f , "system/"..f.."/" , g)
 end
 
-system.update.addmetamethod = function(k,p)
+function system.update.addmetamethod(k,p)
 	p = p or "raw"
 	if not _G[p..k] then
 		_G[p..k] = _G[k]
@@ -35,7 +35,15 @@ end
 
 --table
 
-table.copy = function(t , i , l , k)
+function table.set(self, new)
+    debug.setmetatable( self , {} )
+    for k , v in rawpairs(new) do
+        self[k] = v
+    end
+    setmetatable( self , debug.getmetatable(new) )
+end
+
+function table.copy(t , i , l , k)
 	local n , i , l = {} , i or -1 , l or {}
 	for k , v in rawpairs(t) do
 		if type(v) == "table" then
@@ -60,24 +68,9 @@ table.copy = function(t , i , l , k)
 	return n
 end
 
-table.set = function(t , n , s)
-	for k , v in rawpairs(n) do
-		t[k] = v
-	end
-	rawsetmetatable( t , debug.getmetatable(n) )
-end
-
-table.size = function(t)
-	l = 0
-	for k , v in pairs(t) do
-		l = l + 1
-	end
-	return l
-end
-
 --love
 
-love.graphics.prints = function(t,x,y,w,h,xa,ya)
+function love.graphics.prints(t,x,y,w,h,xa,ya)
 	if not ya or ya == "center" then
 		local l = #( ( {love.graphics.getFont():getWrap(t,w)} )[2] )
 		y = y + h / 2 -  (l * love.graphics.getFont():getHeight())/2
@@ -91,6 +84,10 @@ end
 --setup
 
 function inext(t, var)
+	if not t then
+		love.errhand("ipairs expectes table")
+		love.event.quit()
+	end
 	var = var + 1
 	local value = t[var]
 	if value == nil then return end

@@ -2,18 +2,25 @@ local tile = class:new({
 	type = "tile", name = "def",
 	walkable = true,
 	color = {0,255,0},
-	moveCost = 1,
-	x = 0, y = 0
+	moveCost = 1
 })
 
 --functions
+
+function tile:__tostring()
+	if self.file then
+		return "system.tiles.tiles."..self.file..":new()"
+	else
+		return "system.tiles.tile:new()"
+	end
+end
 
 function tile:draw(x,y,s)
 	--tile
 	local s = s or system.settings.tiles.scale
 	local x = x or (self.x - self.map.x) * system.settings.tiles.scale
 	local y = y or (self.y - self.map.y) * system.settings.tiles.scale
-	love.graphics.setColor(color.green)
+	love.graphics.setColor(self.color)
 	love.graphics.rectangle("fill",x,y,s,s)
 	if system.settings.tiles.line then
 		love.graphics.setColor(color.black)

@@ -52,7 +52,11 @@ textbox:addCallback("keyreleased","empty",function(self,key)
 end)
 
 textbox.draw.text = function(self)
-	local text = (self.startText or "")..(self.text or self.defText or "")..(self.endText or "")
+	local text = (self.startText or "")
+	if self.empty then
+		text = text..(self.defText or "")
+	end
+	text = text..self.text..(self.endText or "")
 	love.graphics.setColor(self.textColor)
 	local l = #( ( {love.graphics.getFont():getWrap(text,self.width)} )[2] )
 	local y = self.y + self.height / 2 -  (l * love.graphics.getFont():getHeight())/2
