@@ -14,9 +14,8 @@ system.tiles.player = require "system/tiles/player"
 system.tiles.tile = require "system/tiles/tile"
 system.tiles.map = require "system/tiles/map"
 
-system.tiles.globolize = function(t)
+function system.tiles:globolize()
 	settings = system.settings
-
 	path = system.tiles.path
 
 	skill = system.tiles.skill
@@ -36,30 +35,41 @@ system.tiles.globolize = function(t)
 	tiles = system.tiles.tiles
 end
 
-function system.tiles:save(data)
-	if data.save then return data:save() end
-	data.file = data.file or data.type:sub(1,1):upper()..(#system.filesystem:getDirectory("data/"..data.type.."s" , ".lua") + 1)
+function system.tiles:format(data, exceptions)
 	local s = "return system.tiles."..data.type..":new({"
 	local t = {}
 	for k , v in pairs(data) do
-		if table.format( data[k] ) ~= table.format( system.tiles[data.type][k] ) then
-			s = table.format(k , s.."[" , t)
-			s = table.format(v , s.."] = " , t)..", "
+		local c = exceptions and ( (exceptions[k] or exceptions.get or function() end)(k, v) )
+		if c ~= nil then
+			if c ~= "" and c ~= " "  then
+				s = s..c..", "
+			end
+		else
+			if table.format( data[k] ) ~= table.format( system.tiles[data.type][k] ) then
+				s = table.format(k , s.."[" , t)
+				s = table.format(v , s.."] = " , t)..", "
+			end
 		end
 	end
-	system.filesystem:write("data/"..data.type.."s/"..data.file..".lua" , s.."})")
 	return s.."})"
 end
 
+function system.tiles:save(data, exceptions)
+	data.file = data.file or data.type:sub(1,1):upper()..(#system.filesystem:getDirectory("data/"..data.type.."s" , ".lua") + 1)
+	local s = data.save and data:save(exceptions) or self:format(data, exceptions)
+	system.filesystem:write("data/"..data.type.."s/"..data.file..".lua" , s)
+	return s
+end
+
 function system.tiles:load(class)
-	system.tiles[class] = {}
+	table.set( system.tiles[class] , {} )
 	for i , file in ipairs( system.filesystem:getDirectory("data/"..class , ".lua") ) do
 		self:addClass( loadstring( system.filesystem:read("data/"..class.."/"..file) )() )
 	end
 end
 
 function system.tiles:loadAll()
-	local classes = {"skills","actions","items","objects","players","tiles","maps"}
+	local classes = {"skills","items","objects","players","tiles","maps"} --add back actions eventualy
 	for i , c in pairs( classes ) do
 		self:load( c )
 	end

@@ -1,48 +1,11 @@
---set up world
+--set up game
 
 game.tab:addLayer( "world" )
-
-game.map = map:new()
-game.team = {player:new({
-	x = 1, y = 1,
-	name = "The big MC man",
-	actions = { actions.fireBolt },
-	ai = {
-		contoller = "player",
-		mode = "s",
-		turn = function(self)
-			if self.ai.mode == "i" then
-				for k in pairs(self.moves) do
-					self.moves[k] = math.huge
-				end
-			end
-		end
-	}
-})}
-
-for i , p in pairs(game.team) do
-	game.map:addPlayer( p )
-end
-
-game.map:addPlayer( player:new({
-	x = 5, y = 5,
-	ai = {
-		contoller = "computer",
-		turn = function(self)
-			self.actions.move(self.x + 1,self.y)
-			self.actions.endTurn()
-		end
-	}
-}) )
-
-game.world:add( game.map )
 
 mouse.tile = {}
 mouse.tile.sx , mouse.tile.sy = 0 , 0
 mouse.tile.ex , mouse.tile.ey = 0 , 0
 mouse.tile.x , mouse.tile.y = 0 , 0
-
-game.map:nextTurn()
 
 --ui
 
@@ -85,8 +48,7 @@ game.ui:add( game.menu:new({
 }) , "actions" )
 
 game.ui:add( game.button:new({
-	text = "inventory",
-	x = 100,
+	text = "inventory", x = 100,
 	func = function()
 		love.open( inventory )
 	end
@@ -104,15 +66,46 @@ game.ui.info:print("───────────────")
 game.ui.info:print("action: ", function() return game.action.name end)
 game.ui.info:print("player: ", function() return game.map.player.name end)
 
-for k , p in pairs(game.team) do
-	local ui = game.ui:add( game.button:new({
-		width = 60, height = 60, text = p.name,
-		x = function() return screen.width - 65 end,
-		y = function() return screen.height - 65 end
-	}) )
-end
-
 --functions
+
+function game.load()
+	game.map = system.tiles.maps.M1
+	game.team = {player:new({
+		x = 1, y = 1,
+		name = "The big MC man",
+		actions = { actions.fireBolt },
+		ai = {
+			contoller = "player",
+			mode = "s",
+			turn = function(self)
+				if self.ai.mode == "i" then
+					for k in pairs(self.moves) do
+						self.moves[k] = math.huge
+					end
+				end
+			end
+		}
+	})}
+
+	for i , p in pairs(game.team) do
+		game.map:addPlayer( p )
+	end
+
+	game.map:addPlayer( player:new({
+		x = 5, y = 5,
+		ai = {
+			contoller = "computer",
+			turn = function(self)
+				self.actions.move(self.x + 1,self.y)
+				self.actions.endTurn()
+			end
+		}
+	}) )
+
+	game.world:add( game.map )
+
+	game.map:nextTurn()
+end
 
 function game.open()
 	love.graphics.setFont( font.default )

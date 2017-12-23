@@ -1,6 +1,7 @@
 local object = class:new({
 	type = "object",
-	child = {active = true}
+	child = {active = true},
+	width = 1, height = 1
 })
 
 function object:dofunc(f, ...)

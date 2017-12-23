@@ -52,3 +52,15 @@ function table.size(self)
     end
     return l
 end
+
+function table.clear(self)
+    for k , v in pairs(self) do
+        self[k] = nil
+    end
+end
+
+function table.iclear(self)
+    for k , v in ipairs(self) do
+        self[k] = nil
+    end
+end

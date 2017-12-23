@@ -37,6 +37,16 @@ function player:__init()
 	self:addAction( system.tiles.actions.endTurn:new() )
 end
 
+function player:__tostring()
+	local s = "system.tiles."
+	if self.file then
+		s = s.."players."..self.file..":new({"
+	else
+		s = s.."player:new({"
+	end
+	return s.."})"
+end
+
 function player:draw(x, y, s)
 	local x = x or (self.gx - self.map.x + 0.5) * system.settings.tiles.scale
 	local y = y or (self.gy - self.map.y + 0.5) * system.settings.tiles.scale

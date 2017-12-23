@@ -1,3 +1,5 @@
+system.update.include("lua")
+
 system.console = require("system/tabs/console")
 system.tab = require("system/tabs/tab")
 

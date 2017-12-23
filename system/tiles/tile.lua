@@ -8,10 +8,27 @@ local tile = class:new({
 --functions
 
 function tile:__tostring()
+	local s = "system.tiles."
 	if self.file then
-		return "system.tiles.tiles."..self.file..":new()"
+		s = s.."tiles."..self.file..":new({"
 	else
-		return "system.tiles.tile:new()"
+		s = s.."tile:new({"
+	end
+	if self.player then
+		s = s.."player = "..tostring( self.player )..", "
+	end
+	if self.object and self.object.tile == self then
+		s = s.."object = "..tostring( self.object )..", "
+	end
+	return s.."})"
+end
+
+function tile:init()
+	if self.player then
+		self:setPlayer( self.player )
+	end
+	if self.object then
+		self:setObject( self.object )
 	end
 end
 
@@ -27,7 +44,7 @@ function tile:draw(x,y,s)
 		love.graphics.rectangle("line",x,y,s,s)
 	end
 	--object
-	if self.object then
+	if self.object and self.object.tile == self then
 		self.object:draw(x,y,s)
 	end
 	--item
@@ -38,8 +55,31 @@ end
 
 function tile:setPlayer(player)
 	self.player = player
-	player.tile.player = nil
+	if player.tile then
+		player.tile.player = nil
+	end
 	player.tile = self
+end
+
+function tile:setObject(object)
+	object.tile = self
+	for x = 0, object.width - 1 do
+		for y = 0, object.height - 1 do
+			self.map[self.x + x][self.y + y]:deletObject()
+			self.map[self.x + x][self.y + y].object = object
+		end
+	end
+end
+
+function tile:deletObject()
+	if not self.object then return end
+	local object = self.object
+	for x = 0, object.width - 1 do
+		for y = 0, object.height - 1 do
+			self.map[object.tile.x + x][object.tile.y + y].object = nil
+		end
+	end
+	object.tile = nil
 end
 
 --load

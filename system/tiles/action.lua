@@ -28,6 +28,16 @@ function action:__call(x,y,...)
 	return (self.func or self.styles[self.style].func)(self , x,y , ...) or true
 end
 
+function action:__tostring()
+	local s = "system.tiles."
+	if self.file then
+		s = s.."actions."..self.file..":new({"
+	else
+		s = s.."action:new({"
+	end
+	return s.."})"
+end
+
 function action:cheak(x,y,...)
 	if not (self.possible or self.styles[self.style].possible)(self , x,y , ...) then return false end
 	if self.player.moves[self.moveType] < self.moves then return false end

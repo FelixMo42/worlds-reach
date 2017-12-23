@@ -14,8 +14,13 @@ function tab:__init()
 	end
 end
 
+local defLayer = {}
+defLayer = { add = table.add , clear = function(self)
+	table.set( self , defLayer )
+end }
+
 function tab:addLayer(name , i)
-	local layer = { add = table.add }
+	local layer = table.copy( defLayer )
 	_G[self.name][name] = layer
 	local i = i or #self.layer  + 1
 	table.insert(self.layer,i,name)
