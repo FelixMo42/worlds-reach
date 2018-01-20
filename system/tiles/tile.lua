@@ -8,19 +8,17 @@ local tile = class:new({
 --functions
 
 function tile:__tostring()
-	local s = "system.tiles."
-	if self.file then
-		s = s.."tiles."..self.file..":new({"
-	else
-		s = s.."tile:new({"
-	end
-	if self.player then
-		s = s.."player = "..tostring( self.player )..", "
-	end
-	if self.object and self.object.tile == self then
-		s = s.."object = "..tostring( self.object )..", "
-	end
-	return s.."})"
+	return system.tiles:tostring( self , {
+		object = function(self, k, v)
+			if v.tile == self then
+				return "object = "..tostring( self.object )
+			end
+			return ""
+		end,
+		map = function() return "" end,
+		x = function() return "" end,
+		y = function() return "" end
+	} )
 end
 
 function tile:init()
@@ -62,24 +60,36 @@ function tile:setPlayer(player)
 end
 
 function tile:setObject(object)
-	object.tile = self
-	for x = 0, object.width - 1 do
-		for y = 0, object.height - 1 do
-			self.map[self.x + x][self.y + y]:deletObject()
-			self.map[self.x + x][self.y + y].object = object
+	for x = object.width - 1, 0, -1 do
+		for y = object.height - 1, 0, -1 do
+			self.map[self.x - x][self.y - y]:deletObject()
+			self.map[self.x - x][self.y - y].object = object
 		end
 	end
+	self.object.tile = self
 end
 
 function tile:deletObject()
-	if not self.object then return end
+	if not self.object or not self.object.tile then return end
 	local object = self.object
 	for x = 0, object.width - 1 do
 		for y = 0, object.height - 1 do
-			self.map[object.tile.x + x][object.tile.y + y].object = nil
+			self.map[object.tile.x - x][object.tile.y - y].object = nil
 		end
 	end
 	object.tile = nil
+end
+
+function tile:setItem(item)
+	self:deletItem()
+	self.item = item
+	item.tile = self
+end
+
+function tile:deletItem()
+	if not self.item then return end
+	self.item.tile = nil
+	self.item = nil
 end
 
 --load

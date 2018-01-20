@@ -35,19 +35,45 @@ function system.tiles:globolize()
 	tiles = system.tiles.tiles
 end
 
-function system.tiles:format(data, exceptions)
-	local s = "return system.tiles."..data.type..":new({"
-	local t = {}
+function system.tiles:tostring(data, exceptions)
+	local s = "system.tiles".."."..data.type
+	local def
+	if data.file then
+		s = s.."s."..data.file..":new({"
+		def = system.tiles[data.type.."s"][data.file]:new()
+	else
+		s = s..":new({"
+		def = system.tiles[data.type]:new()
+	end
 	for k , v in pairs(data) do
-		local c = exceptions and ( (exceptions[k] or exceptions.get or function() end)(k, v) )
+		local c = exceptions and ( (exceptions[k] or exceptions.get or function() end)(data, k, v, def) )
 		if c ~= nil then
 			if c ~= "" and c ~= " "  then
 				s = s..c..", "
 			end
 		else
-			if table.format( data[k] ) ~= table.format( system.tiles[data.type][k] ) then
-				s = table.format(k , s.."[" , t)
-				s = table.format(v , s.."] = " , t)..", "
+			if table.format( data[k] ) ~= table.format( def[k] ) then
+				s = table.format(k , s.."[")
+				s = table.format(v , s.."] = ")..", "
+			end
+		end
+	end
+	return s.."})"
+end
+
+function system.tiles:format(data, exceptions)
+	local s = "return system.tiles."..data.type..":new({"
+	local def = system.tiles[data.type]:new()
+	for k , v in pairs(data) do
+		local c = exceptions and ( (exceptions[k] or exceptions.get or function() end)(data, k, v, def) )
+		if c ~= nil then
+			if c ~= "" and c ~= " "  then
+				s = s..c..", "
+			end
+		elseif type( v ) ~= "function" then
+			if table.format( data[k] ) ~= table.format( def[k] ) then
+				s = table.format(k , s.."[")
+				s = table.format(v , s.."] = ")..", "
 			end
 		end
 	end

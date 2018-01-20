@@ -25,17 +25,11 @@ function action:__call(x,y,...)
 	if self.drawFunc then
 		self.player.queue:add(self, x,y)
 	end
-	return (self.func or self.styles[self.style].func)(self , x,y , ...) or true
+	return (self.func or self.styles[self.style].func)(self, x,y , ...) or true
 end
 
 function action:__tostring()
-	local s = "system.tiles."
-	if self.file then
-		s = s.."actions."..self.file..":new({"
-	else
-		s = s.."action:new({"
-	end
-	return s.."})"
+	return system.tiles:tostring( self )
 end
 
 function action:cheak(x,y,...)
@@ -46,6 +40,10 @@ end
 
 function action:damage(t)
 	t:HP( -math.random( self.Dmin , self.Dmax ) , self.Dtype , self.player )
+end
+
+function action:draw()
+	
 end
 
 action.styles:add( "bolt" , {

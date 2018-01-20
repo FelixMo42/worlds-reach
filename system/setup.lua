@@ -35,8 +35,15 @@ end
 
 --table
 
+function table.rawclear(self)
+	debug.setmetatable( self , {} )
+	for k , v in pairs(self) do
+        self[k] = nil
+    end
+end
+
 function table.set(self, new)
-    debug.setmetatable( self , {} )
+    table.rawclear(self)
     for k , v in rawpairs(new) do
         self[k] = v
     end
@@ -68,41 +75,46 @@ function table.copy(t , i , l , k)
 	return n
 end
 
---love
-
-function love.graphics.prints(t,x,y,w,h,xa,ya)
-	if not ya or ya == "center" then
-		local l = #( ( {love.graphics.getFont():getWrap(t,w)} )[2] )
-		y = y + h / 2 -  (l * love.graphics.getFont():getHeight())/2
-	elseif ya == "bottom" then
-		local l = #( ( {love.graphics.getFont():getWrap(t,w)} )[2] )
-		y = y + h - (l * love.graphics.getFont():getHeight())
-	end
-	love.graphics.printf(t,x,y,w,xa or "center")
-end
-
 --setup
 
-function inext(t, var)
+function ipairs(t,d,...)
 	if not t then
 		love.errhand("ipairs expectes table")
 		love.event.quit()
 	end
-	var = var + 1
+	local mt = getmetatable(t)
+	if mt and mt["__ipairs"] then return mt["__ipairs"](t,...) end
+	local a = d or 1
+	local init = a > 0 and 0 or #t
+	return function(t, var)
+		var = var + a
+		local value = t[var]
+		if value == nil then return end
+		return var, value
+	end, t, init
+end
+
+--[[function inext(t, var, a)
+	var = var + a
 	local value = t[var]
 	if value == nil then return end
 	return var, value
 end
 
-function ipairs(t,...)
+function ipairs(t,i,...)
+	if not t then
+		love.errhand("ipairs expectes table")
+		love.event.quit()
+	end
 	local mt = getmetatable(t)
-	if mt and mt["__ipairs"] then return mt["__ipairs"](t,...) end 
-	return inext, t, 0
-end
+	if mt and mt["__ipairs"] then return mt["__ipairs"](t,...) end
+	local init = (i or 1) > 0 and 0 or #t
+	return funk, t, init, d
+end]]
 
 rawpairs = pairs
 
-function pairs(t,...)
+function pairs(t,i,...)
 	local mt = getmetatable(t)
 	if mt and mt["__pairs"] then return mt["__pairs"](t,...) end 
 	return next, t, nil

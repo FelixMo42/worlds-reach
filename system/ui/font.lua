@@ -1,6 +1,8 @@
 local font = setmetatable( {} , {
 	__index = function(self,key)
-		if type(key) == "number" then
+		if key == "current" then
+			return love.graphics.getFont()
+		elseif type(key) == "number" then
 			return self:get(key)
 		end
 	end
@@ -29,7 +31,7 @@ font.fonts = {}
 
 font.font = "system/ui/Verdana"
 
-font.default = font[love.graphics.getFont():getHeight()]
+font.default = font[font.current:getHeight()]
 
 love.graphics.setFont( font.default )
 

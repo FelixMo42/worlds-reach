@@ -34,11 +34,13 @@ function love.open(t,...)
 	system.tabs.current:dofunc("close",...)
 	if type(t) == "tab" then
 		system.tabs.current = t
-		system.tabs.current:dofunc("open",...)
-	else
+	elseif system.tabs[t] then
 		system.tabs.current = system.tabs[t]
-		system.tabs.current:dofunc("open",...)
+	else
+		love.errhand( tostring(t).." is not a tab")
+		return false
 	end
+	system.tabs.current:dofunc("open",...)
 end
 
 function love.load(...)
@@ -82,25 +84,25 @@ system.mouse = {
 		if system.mouse.drag == false then
 			system.mouse.drag = true
 		end
-		system.mouse.sx , system.mouse.sy = system.mouse.x , system.mouse.y
+		system.mouse.ex , system.mouse.ey = system.mouse.x , system.mouse.y
 		if system.mouse.drag == nil then
-			system.mouse.ex , system.mouse.ey = system.mouse.x , system.mouse.y
+			system.mouse.sx , system.mouse.sy = system.mouse.x , system.mouse.y
 		end
 	end,
 	mousepressed = function(self,x,y,button)
 		system.mouse.used = false
 		system.mouse.drag = false
 		system.mouse.button = button
-		system.mouse.ex = system.mouse.x
-		system.mouse.ey = system.mouse.y
+		system.mouse.sx = system.mouse.x
+		system.mouse.sy = system.mouse.y
 	end,
 	mousereleased = function(self)
 		system.mouse.used = false
 	end,
 	mousereleasedEnd = function(self)
 		system.mouse.drag = nil
-		system.mouse.ex = system.mouse.x
-		system.mouse.ey = system.mouse.y
+		system.mouse.sx = system.mouse.x
+		system.mouse.sy = system.mouse.y
 	end
 }
 

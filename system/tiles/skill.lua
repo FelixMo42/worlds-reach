@@ -7,13 +7,7 @@ local skill = class:new({
 --functions
 
 function skill:__tostring()
-	local s = "system.tiles."
-	if self.file then
-		s = s.."skills."..self.file..":new({"
-	else
-		s = s.."skill:new({"
-	end
-	return s.."})"
+	return system.tiles:tostring( self )
 end
 
 --load

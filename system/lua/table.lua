@@ -64,3 +64,9 @@ function table.iclear(self)
         self[k] = nil
     end
 end
+
+function table.overlay(self, new)
+    for k , v in pairs(new) do
+        self[k] = v
+    end
+end
