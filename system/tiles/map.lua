@@ -33,15 +33,19 @@ function map:draw()
 	--tiles
 	for y = sy , ey do
 		for x = sx , ex do
-			self[x][y]:draw()
+			self[x][y]:drawTile()
 		end
 	end
-	--players
 	for y = sy , ey do
 		for x = sx , ex do
-			if self[x][y].player then
-				self[x][y].player:draw()
-			end
+			self[x][y]:drawObject()
+		end
+		for x = sx , ex do
+			self[x][y]:drawPlayer()
+		end
+
+		for x = sx , ex do
+			self[x][y]:drawItem()
 		end
 	end
 end

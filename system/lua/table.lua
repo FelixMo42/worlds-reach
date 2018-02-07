@@ -70,3 +70,33 @@ function table.overlay(self, new)
         self[k] = v
     end
 end
+
+function table.uptable(func)
+    local value = {}
+    local index = {}
+
+    i = 1
+    while true do
+        local k, v = debug.getupvalue(func, i)
+        if not k then break end
+        value[k] = v
+        index[k] = i
+        i = i + 1
+    end
+
+    return setmetatable( {} , {
+        __index = value,
+        __pairs = value,
+        __ipairs = value,
+        __newindex = function(self,k,v)
+            if index[k] then
+                debug.setupvalue(func, index[k], v)
+            else
+                f = load( "function() end" ,"code","t",{k=v})
+                debug.upvaluejoin(func, #index + 1, f, 1)
+            end
+            value[k] = v
+            index[k] = v
+        end
+    } )
+end

@@ -27,11 +27,11 @@ function console:draw()
 	for i = (#self.log + 1) - d , d , self.direction do
 		local text = self:msg(i)
 		--print text
-		love.graphics.printf(text , self.x or 10 , y , love.graphics.getWidth() - 20)
-		y = y + math.ceil(love.graphics.getFont():getWidth(text) / (love.graphics.getWidth() - 20)) * love.graphics.getFont():getHeight() * self.direction
+		love.graphics.printf(text , self.x or 5 , y , love.graphics.getWidth() - 20)
+		y = y + love.graphics.getTextHeight(text) * self.direction
 	end
 	--print input
-	love.graphics.print(self.input , self.x or 10 , love.graphics.getHeight() - love.graphics.getFont():getHeight() * 1.5)
+	love.graphics.print(self.input , self.x or 5 , love.graphics.getHeight() - love.graphics.getFont():getHeight() * 1.5)
 end
 
 function console:msg(i)
@@ -74,6 +74,27 @@ function console:clear(reset)
 	if reset then
 		self.enter = function() end
 	end
+end
+
+function console:getWidth()
+	local width = 0
+	for i = 1, #self.log do
+		local text = self:msg(i)
+		local w = love.graphics.getTextWidth(text)
+		if w > width then
+			width = w
+		end
+	end
+	return width
+end
+
+function console:getHeight()
+	local height = 0
+	for i = 1, #self.log do
+		local text = self:msg(i)
+		height = height + love.graphics.getTextHeight(text)
+	end
+	return height
 end
 
 return console

@@ -44,11 +44,15 @@ function player:__tostring()
 end
 
 function player:draw(x, y, s)
-	local x = x or (self.gx - self.map.x + 0.5) * system.settings.tiles.scale
-	local y = y or (self.gy - self.map.y + 0.5) * system.settings.tiles.scale
-	local s = s or system.settings.tiles.scale / 2
+	local x = x or (self.gx - self.map.x) * system.settings.tiles.scale
+	local y = y or (self.gy - self.map.y) * system.settings.tiles.scale
+	local s = s or system.settings.tiles.scale
 	love.graphics.setColor(self.color)
-	love.graphics.circle("fill" , x , y , s , s )
+	if self.sprite then
+		self.sprite(x , y , s , s)
+	else
+		love.graphics.circle("fill" , x + .5 * s, y + .5 * s , s / 2 , s / 2 )
+	end
 end
 
 function player:update(dt)

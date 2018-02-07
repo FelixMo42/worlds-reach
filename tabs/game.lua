@@ -57,12 +57,11 @@ game.ui:add( game.button:new({
 game.ui:add( system.console:new({
 	direction = -1,
 	color = color.black,
-	y = screen.height - 25,
+	y = screen.height - 21,
 	font = font:sget(12,"bold"),
 	active = false
 }) , "info" )
 
-game.ui.info:print("───────────────")
 game.ui.info:print("action: ", function() return game.action.name end)
 game.ui.info:print("player: ", function() return game.map.player.name end)
 
@@ -70,7 +69,7 @@ game.ui.info:print("player: ", function() return game.map.player.name end)
 
 function game.load()
 	game.map = system.tiles.maps.M1
-	game.team = {player:new({
+	game.team = { player:new({
 		x = 1, y = 1,
 		name = "The big MC man",
 		actions = { actions.fireBolt },
@@ -85,7 +84,7 @@ function game.load()
 				end
 			end
 		}
-	})}
+	}) }
 
 	for i , p in pairs(game.team) do
 		game.map:addPlayer( p )
@@ -94,7 +93,7 @@ function game.load()
 	game.map:addPlayer( player:new({
 		x = 5, y = 5,
 		ai = {
-			contoller = "computer",
+			contoller = "ai",
 			turn = function(self)
 				self.actions.move(self.x + 1,self.y)
 				self.actions.endTurn()
@@ -121,6 +120,7 @@ function game.update(dt)
 	local px = game.map.player.gx - (screen.width / settings.tiles.scale) / 2 + .5
 	local py = game.map.player.gy - (screen.height / settings.tiles.scale) / 2 + .5
 	game.map:setPos( px , py )
+	love.mousemoved( mouse.x , mouse.y )
 
 	if game.map.player.ai.contoller == "player" then
 		if #game.map.player.queue == 0 then
@@ -143,6 +143,23 @@ function game.update(dt)
 			end
 		end
 	end
+end
+
+function game.draw()
+	--draw action
+	if game.action and game.map.player.ai.contoller == "player" then
+		local sx = (game.map.player.gx + .5 - game.map.x) * settings.tiles.scale
+		local sy = (game.map.player.gy + .5 - game.map.y) * settings.tiles.scale
+		local ex = (mouse.tile.x - game.map.x + .5) * settings.tiles.scale
+		local ey = (mouse.tile.y - game.map.y + .5) * settings.tiles.scale
+		game.action:draw(sx,sy, ex,ey)
+	end
+	--info box
+	local h , w = game.ui.info:getHeight() , game.ui.info:getWidth()
+	love.graphics.setColor( 200,200,200,200 )
+	love.graphics.rectangle("fill", -5,screen.height - h - 13 , w + 20,h + 20, 5)
+	love.graphics.setColor( color.black )
+	love.graphics.rectangle("line", -5,screen.height - h - 13 , w + 20,h + 20 , 5)
 end
 
 function game.mousemoved(x,y)

@@ -13,6 +13,7 @@ _FUNCTIONS = {
 	"mousefocus",
 	"visible",
 	"directorydropped",
+	"filedropped",
 	"resize",
 	"load",
 	"quit"
@@ -77,7 +78,7 @@ end
 system.mouse = {
 	x = love.mouse.getX(), y = love.mouse.getY(),
 	dx = 0, dy = 0, sx = 0, sy = 0, ex = 0, ey = 0,
-	button = 0, drag = false, used = false,
+	button = 0, drag = false, used = false, down = false,
 	mousemoved = function(self,x,y,dx,dy)
 		system.mouse.dx , system.mouse.dy = dx , dy
 		system.mouse.x , system.mouse.y = x , y
@@ -92,11 +93,13 @@ system.mouse = {
 	mousepressed = function(self,x,y,button)
 		system.mouse.used = false
 		system.mouse.drag = false
+		system.mouse.down = true
 		system.mouse.button = button
 		system.mouse.sx = system.mouse.x
 		system.mouse.sy = system.mouse.y
 	end,
 	mousereleased = function(self)
+		system.mouse.down = false
 		system.mouse.used = false
 	end,
 	mousereleasedEnd = function(self)

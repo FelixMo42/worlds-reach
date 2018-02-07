@@ -1,4 +1,5 @@
 function love.graphics.prints(t,x,y,w,h,xa,ya)
+	if type(t) == "function" then t = t(x,y,w,h,xa,ya) end
 	ya , t = ya or "center" , t..""
 	if ya == "center" then
 		y = y + h / 2 -  love.graphics.getTextHeight(t,w)/2

@@ -13,10 +13,13 @@ system.tiles.object = require "system/tiles/object"
 system.tiles.player = require "system/tiles/player"
 system.tiles.tile = require "system/tiles/tile"
 system.tiles.map = require "system/tiles/map"
+system.tiles.spriteSheet = require "system/tiles/spriteSheet"
 
 function system.tiles:globolize()
 	settings = system.settings
 	path = system.tiles.path
+	spriteSheet = system.tiles.spriteSheet
+	spriteSheets = system.tiles.spriteSheets
 
 	skill = system.tiles.skill
 	action = system.tiles.action

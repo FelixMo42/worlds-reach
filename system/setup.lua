@@ -47,31 +47,27 @@ function table.set(self, new)
     for k , v in rawpairs(new) do
         self[k] = v
     end
-    setmetatable( self , debug.getmetatable(new) )
+    debug.setmetatable( self , debug.getmetatable(new) )
 end
 
-function table.copy(t , i , l , k)
-	local n , i , l = {} , i or -1 , l or {}
+function table.copy(t , s)
+	local n = {}
+	local s = s or { [t] = n }
 	for k , v in rawpairs(t) do
-		if type(v) == "table" then
-			if not l[v] and i ~= 0 then
-				l[v] = {}
-				table.set( l[v] , table.copy(v , i - 1 , l , k) )
-			end
-			n[k] = l[v]
-		else
-			n[k] = v
+		if type(v) == "table" and not s[v] then
+			s[v] = {}
+			table.set( s[v] , table.copy(v , s) )
 		end
+		n[k] = s[v] or v
 	end
 	local m = debug.getmetatable( t )
 	if m then
-		if not l[m] then
-			l[m] = {}
-			table.set( l[m] , table.copy(m , -1 , l) )
+		if not s[m] then
+			s[m] = {}
+			table.set( s[m] , table.copy(m , s) )
 		end
-		rawsetmetatable( n , l[m] )
+		setmetatable( n , s[m] )
 	end
-	str = ""
 	return n
 end
 
@@ -83,7 +79,12 @@ function ipairs(t,d,...)
 		love.event.quit()
 	end
 	local mt = getmetatable(t)
-	if mt and mt["__ipairs"] then return mt["__ipairs"](t,...) end
+	if mt and mt["__ipairs"] then
+		if type(mt["__ipairs"]) == "function" then
+			return mt["__ipairs"](t,...)
+		end
+		return ipairs( mt["__ipairs"] )
+	end
 	local a = d or 1
 	local init = a > 0 and 0 or #t
 	return function(t, var)
@@ -94,29 +95,16 @@ function ipairs(t,d,...)
 	end, t, init
 end
 
---[[function inext(t, var, a)
-	var = var + a
-	local value = t[var]
-	if value == nil then return end
-	return var, value
-end
-
-function ipairs(t,i,...)
-	if not t then
-		love.errhand("ipairs expectes table")
-		love.event.quit()
-	end
-	local mt = getmetatable(t)
-	if mt and mt["__ipairs"] then return mt["__ipairs"](t,...) end
-	local init = (i or 1) > 0 and 0 or #t
-	return funk, t, init, d
-end]]
-
 rawpairs = pairs
 
 function pairs(t,i,...)
 	local mt = getmetatable(t)
-	if mt and mt["__pairs"] then return mt["__pairs"](t,...) end 
+	if mt and mt["__pairs"] then
+		if type(mt["__pairs"]) == "function" then
+			return mt["__pairs"](t,...)
+		end
+		return pairs( mt["__pairs"] )
+	end
 	return next, t, nil
 end
 

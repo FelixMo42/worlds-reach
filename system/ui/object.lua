@@ -53,14 +53,27 @@ function object:addChild(c,i,n)
 		i = n
 	end
 	i = i or #self.child + 1
+	c.parent = self.child.parent
+	table.insert(self.child , i , c)
+	return c
+end
+
+function object:deletChild(c,i,n)
+	if type(i) == "string" then
+		self.child[i] = c
+		i = n
+	end
+	i = i or #self.child + 1
 	c.parent = self
 	table.insert(self.child , i , c)
 	return c
 end
 
+object.child.parent = object
+
 function object.child:is(var)
 	local is = false
-	for k , item in pairs(self) do
+	for k , item in ipairs(self) do
 		if rawtype(item) == "table" then
 			if item[var] then is = item[var] or is end
 			if #(item.child or {}) > 0 and item.child.is then
@@ -80,8 +93,8 @@ function object.child:get(var)
 end
 
 function object.child:clear(new)
-	for k , v in pairs(self) do
-		if rawtype(v) == "table" then self[k] = nil end
+	for k , v in ipairs(self) do
+		self[k] = nil
 	end
 end
 

@@ -30,24 +30,50 @@ function tile:init()
 	end
 end
 
-function tile:draw(x,y,s)
-	--tile
+function tile:drawTile(x,y,s)
 	local s = s or system.settings.tiles.scale
 	local x = x or (self.x - self.map.x) * system.settings.tiles.scale
 	local y = y or (self.y - self.map.y) * system.settings.tiles.scale
+	--tile
 	love.graphics.setColor(self.color)
-	love.graphics.rectangle("fill",x,y,s,s)
+	if self.sprite then
+		self.sprite(x,y,s,s)
+	else
+		love.graphics.rectangle("fill",x,y,s,s)
+	end
 	if system.settings.tiles.line then
 		love.graphics.setColor(color.black)
 		love.graphics.rectangle("line",x,y,s,s)
 	end
-	--object
-	if self.object and self.object.tile == self then
-		self.object:draw(x,y,s)
-	end
+end
+
+function tile:drawItem(x,y,s)
+	local s = s or system.settings.tiles.scale
+	local x = x or (self.x - self.map.x) * system.settings.tiles.scale
+	local y = y or (self.y - self.map.y) * system.settings.tiles.scale
 	--item
 	if self.item then
 		self.item:draw(x,y,s)
+	end
+end
+
+function tile:drawPlayer(x,y,s)
+	local s = s or system.settings.tiles.scale
+	local x = x or (self.x - self.map.x) * system.settings.tiles.scale
+	local y = y or (self.y - self.map.y) * system.settings.tiles.scale
+	--player
+	if self.player then
+		self.player:draw()
+	end
+end
+
+function tile:drawObject(x,y,s)
+	local s = s or system.settings.tiles.scale
+	local x = x or (self.x - self.map.x) * system.settings.tiles.scale
+	local y = y or (self.y - self.map.y) * system.settings.tiles.scale
+	--object
+	if self.object and self.object.tile == self then
+		self.object:draw(x,y,s)
 	end
 end
 
